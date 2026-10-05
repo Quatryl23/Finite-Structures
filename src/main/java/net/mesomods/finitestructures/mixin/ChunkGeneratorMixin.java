@@ -8,10 +8,8 @@ import net.mesomods.finitestructures.StructureLimitData;
 import net.mesomods.finitestructures.notmixin.StructureLimitDataUser;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -87,7 +85,7 @@ public abstract class ChunkGeneratorMixin implements StructureLimitDataUser {
     }
 
     @Inject(method = "tryGenerateStructure", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/StructureManager;setStartForStructure(Lnet/minecraft/core/SectionPos;Lnet/minecraft/world/level/levelgen/structure/Structure;Lnet/minecraft/world/level/levelgen/structure/StructureStart;Lnet/minecraft/world/level/chunk/StructureAccess;)V"), cancellable = true)
-    public void finiteStructures$nTryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkAccess chunkAccess, ChunkPos chunkPos, SectionPos sectionPos, ResourceKey<Level> resourceKey, CallbackInfoReturnable<Boolean> cir, @Local Structure structure) {
+    public void finiteStructures$nTryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkAccess chunkAccess, ChunkPos chunkPos, SectionPos sectionPos, CallbackInfoReturnable<Boolean> cir, @Local Structure structure) {
         if (this.finiteStructures$structureLimitData != null) {
             Registry<Structure> registry = registryAccess.lookupOrThrow(Registries.STRUCTURE);
             if (!finiteStructures$structureLimitData.allowStructureAtPosition(registry.wrapAsHolder(structure), chunkPos, true)) {
