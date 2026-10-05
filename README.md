@@ -9,7 +9,6 @@ File extension: `.json`
 ```
 {
   "target": "#wonders:wonder",
-  "dimension": "minecraft:overworld",
   "count": 7,
   "priority": 0,
   "group_mode": "group",
