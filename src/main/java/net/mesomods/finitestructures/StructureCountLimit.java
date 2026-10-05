@@ -231,7 +231,7 @@ public class StructureCountLimit {
         }
 
         public BlockPos getCenter(ServerLevel level, LootContext context) {
-            BlockPos pos = source == CenterSource.SPAWN ? level.getRespawnData().pos() : BlockPos.ZERO;
+            BlockPos pos = source == CenterSource.SPAWN ? level.getSharedSpawnPos() : BlockPos.ZERO;
             double multiplier = 1.0 / level.dimensionType().coordinateScale();
             return BlockPos.containing(offset(pos, context).getCenter().multiply(multiplier, 1, multiplier));
         }
