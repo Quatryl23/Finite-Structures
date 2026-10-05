@@ -34,7 +34,7 @@ public abstract class StructureCheckMixin implements StructureLimitDataUser {
     @Inject(method = "canCreateStructure", at = @At("RETURN"), cancellable = true)
     private void finiteStructures$canCreateStructure(ChunkPos chunkPos, Structure structure, CallbackInfoReturnable<Boolean> cir) {
         if (this.finiteStructures$structureLimitData != null) {
-            Registry<Structure> registry = this.registryAccess.lookupOrThrow(Registries.STRUCTURE);
+            Registry<Structure> registry = this.registryAccess.registryOrThrow(Registries.STRUCTURE);
             if (cir.getReturnValue() & !finiteStructures$structureLimitData.allowStructureAtPosition(registry.wrapAsHolder(structure), chunkPos, false)) {
                 cir.setReturnValue(false);
             }

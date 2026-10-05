@@ -2,21 +2,23 @@ package net.mesomods.finitestructures;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProviders;
 
-import java.awt.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -76,6 +78,40 @@ public class StructureCountLimit {
         return rule.center;
     }
 
+    public enum GroupMode implements StringRepresentable {
+        GROUP("group"),
+        SEPARATE("separate");
+
+        static final StringRepresentable.EnumCodec<GroupMode> CODEC = StringRepresentable.fromEnum(GroupMode::values);
+        private final String string;
+
+        GroupMode(String string) {
+            this.string = string;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return this.string;
+        }
+    }
+
+    public enum LimitMode implements StringRepresentable {
+        NEAREST("nearest"),
+        FOUND_FIRST("found_first");
+
+        static final StringRepresentable.EnumCodec<LimitMode> CODEC = StringRepresentable.fromEnum(LimitMode::values);
+        private final String string;
+
+        LimitMode(String string) {
+            this.string = string;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return this.string;
+        }
+    }
+
     public abstract static class Rule {
         protected final NumberProvider count;
         protected final CenterPos center;
@@ -88,7 +124,7 @@ public class StructureCountLimit {
         }
 
         public static LootContext createContext(ServerLevel level) {
-            return new LootContext.Builder(new LootParams.Builder(level).create(new ContextKeySet.Builder().build())).create(Optional.empty());
+            return new LootContext.Builder(new LootParams.Builder(level).create(new LootContextParamSet.Builder().build())).create(Optional.empty());
         }
 
         public boolean isLocated() {
@@ -110,26 +146,30 @@ public class StructureCountLimit {
     }
 
     public static class SingleRule extends Rule {
-        private final Set<Holder<Structure>> structures;
+        private final HolderSet<Structure> holderSet;
+        private Set<Holder<Structure>> structures;
 
         public SingleRule(NumberProvider count, CenterPos center, LimitMode limitMode, HolderSet<Structure> structures) {
             super(count, center, limitMode);
-            this.structures = new HashSet<>(structures.stream().collect(Collectors.toUnmodifiableSet()));
+            this.holderSet = structures;
         }
 
         @Override
         public Set<Holder<Structure>> getStructures() {
+            if (structures == null) {
+                structures = holderSet.stream().collect(Collectors.toCollection(HashSet::new));
+            }
             return structures;
         }
 
         public void onOverride(Holder<Structure> structure) {
-            this.structures.remove(structure);
+            this.getStructures().remove(structure);
         }
 
         public Map<Holder<Structure>, Set<ChunkPos>> apply(ServerLevel level) {
             Map<Holder<Structure>, Set<ChunkPos>> positions = new HashMap<>();
             LootContext context = createContext(level);
-            for (Holder<Structure> structure : this.structures) {
+            for (Holder<Structure> structure : this.getStructures()) {
                 BlockPos pos = center.getCenter(level, context);
                 LocatedStructurePositions found = StructureFinder.findNearestStructures(Set.of(structure), level, pos, resolveCount(level));
                 if (found != null) positions.putAll(found.getPositions());
@@ -144,19 +184,23 @@ public class StructureCountLimit {
     }
 
     public static class GroupRule extends Rule {
-        private final Set<Holder<Structure>> group;
-        private final int originalSize;
+        private final HolderSet<Structure> holderSet;
+        private Set<Holder<Structure>> group;
+        private int originalSize;
         private final MemberOverrideReaction reaction;
 
-        public GroupRule(NumberProvider count, CenterPos center, LimitMode limitMode, HolderSet<Structure> group, MemberOverrideReaction reaction) {
+        public GroupRule(NumberProvider count, CenterPos center, LimitMode limitMode, HolderSet<Structure> holderSet, MemberOverrideReaction reaction) {
             super(count, center, limitMode);
-            this.group = new HashSet<>(group.stream().collect(Collectors.toUnmodifiableSet()));
-            this.originalSize = group.size();
+            this.holderSet = holderSet;
             this.reaction = reaction;
         }
 
         @Override
         public Set<Holder<Structure>> getStructures() {
+            if (group == null) {
+                group = holderSet.stream().collect(Collectors.toCollection(HashSet::new));
+                this.originalSize = group.size();
+            }
             return group;
         }
 
@@ -194,9 +238,8 @@ public class StructureCountLimit {
             IGNORE("ignore"),
             REDUCE_COUNT("reduce_count");
 
-            private final String string;
-
             static final StringRepresentable.EnumCodec<MemberOverrideReaction> CODEC = StringRepresentable.fromEnum(MemberOverrideReaction::values);
+            private final String string;
 
             MemberOverrideReaction(String string) {
                 this.string = string;
@@ -210,19 +253,17 @@ public class StructureCountLimit {
     }
 
     public static class CenterPos {
-        private final CenterSource source;
-        private final Optional<NumberProvider> x;
-        private final Optional<NumberProvider> z;
-        private Integer resolved_x;
-        private Integer resolved_z;
-
         public static final Codec<CenterPos> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 CenterSource.CODEC.fieldOf("source").forGetter(CenterPos::getSource),
                 NumberProviders.CODEC.optionalFieldOf("offset_x").forGetter(CenterPos::getX),
                 NumberProviders.CODEC.optionalFieldOf("offset_z").forGetter(CenterPos::getZ)
         ).apply(instance, CenterPos::new));
-
         public static final CenterPos DEFAULT = new CenterPos(CenterSource.SPAWN, Optional.empty(), Optional.empty());
+        private final CenterSource source;
+        private final Optional<NumberProvider> x;
+        private final Optional<NumberProvider> z;
+        private Integer resolved_x;
+        private Integer resolved_z;
 
         CenterPos(CenterSource source, Optional<NumberProvider> x, Optional<NumberProvider> z) {
             this.source = source;
@@ -262,9 +303,8 @@ public class StructureCountLimit {
             ZERO("fixed"),
             SPAWN("spawn");
 
-            private final String string;
-
             static final StringRepresentable.EnumCodec<CenterSource> CODEC = StringRepresentable.fromEnum(CenterSource::values);
+            private final String string;
 
             CenterSource(String string) {
                 this.string = string;
@@ -274,42 +314,6 @@ public class StructureCountLimit {
             public String getSerializedName() {
                 return string;
             }
-        }
-    }
-
-    public enum GroupMode implements StringRepresentable {
-        GROUP("group"),
-        SEPARATE("separate");
-
-        private final String string;
-
-        static final StringRepresentable.EnumCodec<GroupMode> CODEC = StringRepresentable.fromEnum(GroupMode::values);
-
-        GroupMode(String string) {
-            this.string = string;
-        }
-
-        @Override
-        public String getSerializedName() {
-            return this.string;
-        }
-    }
-
-    public enum LimitMode implements StringRepresentable {
-        NEAREST("nearest"),
-        FOUND_FIRST("found_first");
-
-        private final String string;
-
-        static final StringRepresentable.EnumCodec<LimitMode> CODEC = StringRepresentable.fromEnum(LimitMode::values);
-
-        LimitMode(String string) {
-            this.string = string;
-        }
-
-        @Override
-        public String getSerializedName() {
-            return this.string;
         }
     }
 }
