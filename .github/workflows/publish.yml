@@ -33,3 +33,4 @@ jobs:
           curseforge-id: 1728468
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           changelog-file: CHANGELOG.md
+          environment: server | singleplayer
