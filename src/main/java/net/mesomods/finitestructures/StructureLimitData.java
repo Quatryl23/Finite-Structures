@@ -30,8 +30,7 @@ public class StructureLimitData extends SavedData {
     public static final SavedDataType<StructureLimitData> TYPE = new SavedDataType<>(
             "structure_limits",
             () -> new StructureLimitData(false, new HashMap<>(), new ArrayList<>()),
-            CODEC,
-            null
+            CODEC
     );
     private final boolean initialized;
     private final Map<Holder<Structure>, Positions> structurePositions;

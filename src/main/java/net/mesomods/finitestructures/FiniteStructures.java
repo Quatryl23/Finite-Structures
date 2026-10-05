@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 @Mod(FiniteStructures.MODID)
 public class FiniteStructures {
     public static final String MODID = "finite_structures";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    static final Logger LOGGER = LogUtils.getLogger();
 
     public FiniteStructures(IEventBus modEventBus, ModContainer modContainer) {
     }
