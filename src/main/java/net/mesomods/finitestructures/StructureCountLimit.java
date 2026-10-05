@@ -217,7 +217,7 @@ public class StructureCountLimit {
         private Integer resolved_z;
 
         public static final Codec<CenterPos> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                CenterSource.CODEC.fieldOf("type").forGetter(CenterPos::getSource),
+                CenterSource.CODEC.fieldOf("source").forGetter(CenterPos::getSource),
                 NumberProviders.CODEC.optionalFieldOf("offset_x").forGetter(CenterPos::getX),
                 NumberProviders.CODEC.optionalFieldOf("offset_z").forGetter(CenterPos::getZ)
         ).apply(instance, CenterPos::new));
