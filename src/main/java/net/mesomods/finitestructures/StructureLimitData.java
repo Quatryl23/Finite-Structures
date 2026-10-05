@@ -28,7 +28,7 @@ public class StructureLimitData extends SavedData {
             Codec.list(Codec.list(Structure.CODEC).xmap(list -> (Set<Holder<Structure>>) list.stream().collect( Collectors.toCollection(ConcurrentHashMap::newKeySet)), set -> set.stream().toList())).fieldOf("synchronized").forGetter(StructureLimitData::getSynchronizedSets)
     ).apply(instance, StructureLimitData::new));
     public static final SavedDataType<StructureLimitData> TYPE = new SavedDataType<>(
-            "structure_limits",
+            FiniteStructures.id("structure_limits"),
             () -> new StructureLimitData(false, new HashMap<>(), new ArrayList<>()),
             CODEC
     );
