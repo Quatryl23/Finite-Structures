@@ -46,7 +46,7 @@ public abstract class ChunkGeneratorMixin implements StructureLimitDataUser {
     }
 
     @Inject(method = "findNearestMapStructure", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/SectionPos;blockToSectionCoord(I)I", ordinal = 0), cancellable = true)
-    public void finiteStructures$findNearestMapStructureFaster(ServerLevel serverLevel, HolderSet<Structure> holderSet, BlockPos blockPos, int i, boolean bl, CallbackInfoReturnable<Pair<BlockPos, Holder<Structure>>> cir, @Local List<Map.Entry<StructurePlacement, Set<Holder<Structure>>>> list) {
+    public void finiteStructures$findNearestMapStructureFaster(ServerLevel serverLevel, HolderSet<Structure> holderSet, BlockPos blockPos, int i, boolean bl, CallbackInfoReturnable<Pair<BlockPos, Holder<Structure>>> cir, @Local(name = "randomSpreadEntries") List<Map.Entry<StructurePlacement, Set<Holder<Structure>>>> list) {
         for (Holder<Structure> holder : holderSet) {
             if (!finiteStructures$structureLimitData.isLimited(holder)) return;
 
@@ -70,7 +70,7 @@ public abstract class ChunkGeneratorMixin implements StructureLimitDataUser {
     @Definition(id = "pair3", local = @Local(type = Pair.class, index = 20))
     @Expression("pair = pair3")
     @Inject(method = "findNearestMapStructure", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
-    public void finiteStructures$storeSuccessfulPlacement(ServerLevel serverLevel, HolderSet<Structure> holderSet, BlockPos blockPos, int i, boolean bl, CallbackInfoReturnable<Pair<BlockPos, Holder<Structure>>> cir, @Local RandomSpreadStructurePlacement placement) {
+    public void finiteStructures$storeSuccessfulPlacement(ServerLevel serverLevel, HolderSet<Structure> holderSet, BlockPos blockPos, int i, boolean bl, CallbackInfoReturnable<Pair<BlockPos, Holder<Structure>>> cir, @Local(name = "randomPlacement") RandomSpreadStructurePlacement placement) {
         this.finiteStructures$successfulPlacement = placement;
     }
 
@@ -79,7 +79,7 @@ public abstract class ChunkGeneratorMixin implements StructureLimitDataUser {
         if (this.finiteStructures$structureLimitData != null && this.finiteStructures$successfulPlacement != null) {
             Vec3i locateOffset = ((StructurePlacementAccessor) finiteStructures$successfulPlacement).getLocateOffset();
             Vec3i invertedOffset = locateOffset.multiply(-1);
-            ChunkPos chunkPos = new ChunkPos(cir.getReturnValue().getFirst().offset(invertedOffset));
+            ChunkPos chunkPos = ChunkPos.containing(cir.getReturnValue().getFirst().offset(invertedOffset));
             if (!finiteStructures$structureLimitData.allowStructureAtPosition(cir.getReturnValue().getSecond(), chunkPos, true)) {
                 cir.setReturnValue(null);
             }
@@ -87,7 +87,7 @@ public abstract class ChunkGeneratorMixin implements StructureLimitDataUser {
     }
 
     @Inject(method = "tryGenerateStructure", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/StructureManager;setStartForStructure(Lnet/minecraft/core/SectionPos;Lnet/minecraft/world/level/levelgen/structure/Structure;Lnet/minecraft/world/level/levelgen/structure/StructureStart;Lnet/minecraft/world/level/chunk/StructureAccess;)V"), cancellable = true)
-    public void finiteStructures$nTryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkAccess chunkAccess, ChunkPos chunkPos, SectionPos sectionPos, ResourceKey<Level> resourceKey, CallbackInfoReturnable<Boolean> cir, @Local Structure structure) {
+    public void finiteStructures$nTryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkAccess chunkAccess, ChunkPos chunkPos, SectionPos sectionPos, ResourceKey<Level> resourceKey, CallbackInfoReturnable<Boolean> cir, @Local(name = "structure") Structure structure) {
         if (this.finiteStructures$structureLimitData != null) {
             Registry<Structure> registry = registryAccess.lookupOrThrow(Registries.STRUCTURE);
             if (!finiteStructures$structureLimitData.allowStructureAtPosition(registry.wrapAsHolder(structure), chunkPos, true)) {

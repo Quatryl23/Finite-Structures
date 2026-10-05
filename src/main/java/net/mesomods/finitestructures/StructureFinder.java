@@ -93,7 +93,7 @@ public class StructureFinder {
     private static Pair<ChunkPos, Holder<Structure>> checkChunk(Holder<Structure> structure, LevelReader level, StructureManager manager, StructurePlacement placement, ChunkPos pos) {
         StructureCheckResult checkResult = manager.checkStructurePresence(pos, structure.value(), placement, false);
         if (checkResult == StructureCheckResult.CHUNK_LOAD_NEEDED) {
-            ChunkAccess chunkAccess = level.getChunk(pos.x, pos.z, ChunkStatus.STRUCTURE_STARTS);
+            ChunkAccess chunkAccess = level.getChunk(pos.x(), pos.z(), ChunkStatus.STRUCTURE_STARTS);
             StructureStart structureStart = manager.getStartForStructure(SectionPos.bottomOf(chunkAccess), structure.value(), chunkAccess);
             if (structureStart != null && structureStart.isValid()) {
                 return Pair.of(structureStart.getChunkPos(), structure);
