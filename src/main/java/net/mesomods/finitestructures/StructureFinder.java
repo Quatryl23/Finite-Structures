@@ -94,7 +94,7 @@ public class StructureFinder {
         StructureCheckResult checkResult = manager.checkStructurePresence(pos, structure.value(), placement, false);
         if (checkResult == StructureCheckResult.CHUNK_LOAD_NEEDED) {
             ChunkAccess chunkAccess = level.getChunk(pos.x(), pos.z(), ChunkStatus.STRUCTURE_STARTS);
-            StructureStart structureStart = manager.getStartForStructure(SectionPos.bottomOf(chunkAccess), structure.value(), chunkAccess);
+            StructureStart structureStart = manager.getStartForStructure(structure.value(), chunkAccess);
             if (structureStart != null && structureStart.isValid()) {
                 return Pair.of(structureStart.getChunkPos(), structure);
             }

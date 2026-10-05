@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.RandomState;
@@ -86,11 +87,11 @@ public abstract class ChunkGeneratorMixin implements StructureLimitDataUser {
         }
     }
 
-    @Inject(method = "tryGenerateStructure", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/StructureManager;setStartForStructure(Lnet/minecraft/core/SectionPos;Lnet/minecraft/world/level/levelgen/structure/Structure;Lnet/minecraft/world/level/levelgen/structure/StructureStart;Lnet/minecraft/world/level/chunk/StructureAccess;)V"), cancellable = true)
-    public void finiteStructures$nTryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkAccess chunkAccess, ChunkPos chunkPos, SectionPos sectionPos, ResourceKey<Level> resourceKey, CallbackInfoReturnable<Boolean> cir, @Local(name = "structure") Structure structure) {
+    @Inject(method = "tryGenerateStructure", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/StructureManager;setStartForStructure(Lnet/minecraft/world/level/levelgen/structure/Structure;Lnet/minecraft/world/level/levelgen/structure/StructureStart;Lnet/minecraft/world/level/chunk/StructureAccess;)V"), cancellable = true)
+    public void finiteStructures$onTryGenerateStructure(StructureSet.StructureSelectionEntry selected, StructureManager structureManager, RegistryAccess registryAccess, RandomState randomState, StructureTemplateManager structureTemplateManager, long seed, ChunkAccess centerChunk, ChunkPos sourceChunkPos, ResourceKey<Level> level, Climate.Sampler climateSampler, CallbackInfoReturnable<Boolean> cir, @Local(name = "structure") Structure structure) {
         if (this.finiteStructures$structureLimitData != null) {
             Registry<Structure> registry = registryAccess.lookupOrThrow(Registries.STRUCTURE);
-            if (!finiteStructures$structureLimitData.allowStructureAtPosition(registry.wrapAsHolder(structure), chunkPos, true)) {
+            if (!finiteStructures$structureLimitData.allowStructureAtPosition(registry.wrapAsHolder(structure), sourceChunkPos, true)) {
                 cir.setReturnValue(false);
             }
         }
