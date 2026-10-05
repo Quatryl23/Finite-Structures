@@ -2,15 +2,20 @@ package net.mesomods.finitestructures;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.level.saveddata.SavedDataType;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -21,18 +26,17 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class StructureLimitData extends SavedData {
+    public static final String ID = "structure_limits";
     public static final Logger LOGGER = FiniteStructures.LOGGER;
     public static final Codec<StructureLimitData> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             Codec.BOOL.fieldOf("initialized").forGetter(StructureLimitData::isInitialized),
             Codec.unboundedMap(Structure.CODEC, Positions.CODEC).fieldOf("positions").forGetter(StructureLimitData::getStructurePositions),
             Codec.list(Codec.list(Structure.CODEC).xmap(list -> (Set<Holder<Structure>>) list.stream().collect( Collectors.toCollection(ConcurrentHashMap::newKeySet)), set -> set.stream().toList())).fieldOf("synchronized").forGetter(StructureLimitData::getSynchronizedSets)
     ).apply(instance, StructureLimitData::new));
-    public static final SavedDataType<StructureLimitData> TYPE = new SavedDataType<>(
-            "structure_limits",
+    public static final SavedData.Factory<StructureLimitData> TYPE = new SavedData.Factory<>(
             () -> new StructureLimitData(false, new HashMap<>(), new ArrayList<>()),
-            CODEC,
-            null
-    );
+            StructureLimitData::load,
+            null);
     private final boolean initialized;
     private final Map<Holder<Structure>, Positions> structurePositions;
     private final List<Set<Holder<Structure>>> synchronizedSets;
@@ -120,6 +124,17 @@ public class StructureLimitData extends SavedData {
             if (remaining == 0) synchronizedSets.remove(set);
         }
         this.setDirty();
+    }
+
+    @Override
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
+        DataResult<Tag> result = CODEC.encodeStart(RegistryOps.create(NbtOps.INSTANCE, provider), this);
+        return tag.merge((CompoundTag) result.getOrThrow());
+    }
+
+    public static StructureLimitData load(CompoundTag tag, HolderLookup.Provider provider) {
+        DataResult<StructureLimitData> result = CODEC.parse(RegistryOps.create(NbtOps.INSTANCE, provider), tag);
+        return result.getOrThrow();
     }
 
     public static class Positions {

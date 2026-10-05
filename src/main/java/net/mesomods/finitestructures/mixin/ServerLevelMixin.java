@@ -41,10 +41,10 @@ public abstract class ServerLevelMixin extends LevelMixin implements net.mesomod
     @Unique
     @Override
     public void finiteStructures$initializeStructureLimitData() {
-        StructureLimitData data = this.getDataStorage().computeIfAbsent(StructureLimitData.TYPE);
+        StructureLimitData data = this.getDataStorage().computeIfAbsent(StructureLimitData.TYPE, StructureLimitData.ID);
         if (!data.isInitialized()) {
             data = StructureLimitData.create((ServerLevel) (Object) this, ((MinecraftServerMixin) this.getServer()).finiteStructures$getStructureCountLimitManager());
-            this.getDataStorage().set(StructureLimitData.TYPE, data);
+            this.getDataStorage().set(StructureLimitData.ID, data);
         }
         ((StructureLimitDataUser) this.structureCheck).finiteStructures$setStructureLimitData(data);
         ((StructureLimitDataUser) this.chunkSource.getGenerator()).finiteStructures$setStructureLimitData(data);
