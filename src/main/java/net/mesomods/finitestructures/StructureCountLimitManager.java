@@ -4,7 +4,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.Structure;
 
 import java.util.*;
@@ -23,7 +23,7 @@ public class StructureCountLimitManager {
                 HolderSet<Structure> targets = limit.getStructure();
                 StructureCountLimit.Rule rule = limit.getRule();
                 if (rule == null) {
-                    Identifier id = reg.getKey(limit);
+                    ResourceLocation id = reg.getKey(limit);
                     FiniteStructures.LOGGER.warn("Structure Limit {} failed to load, likely due to invalid structure references", id);
                     continue;
                 }
