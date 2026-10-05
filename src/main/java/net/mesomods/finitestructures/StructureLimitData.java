@@ -45,7 +45,7 @@ public class StructureLimitData extends SavedData {
     public static StructureLimitData create(ServerLevel level, StructureCountLimitManager manager) {
         Map<Holder<Structure>, Positions> positions = new ConcurrentHashMap<>();
         List<Set<Holder<Structure>>> synchronizedSets = new ArrayList<>();
-        LOGGER.info("Preparing structure limits for {}", level.dimension().identifier());
+        LOGGER.info("Preparing structure limits for {}", level.dimension().location());
         manager.rules.forEach((rule) -> {
             if (rule.isLocated()) {
                 Map<Holder<Structure>, Set<ChunkPos>> located = rule.apply(level);
