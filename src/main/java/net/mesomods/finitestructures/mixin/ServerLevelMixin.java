@@ -33,20 +33,20 @@ public abstract class ServerLevelMixin extends LevelMixin implements net.mesomod
     public abstract MinecraftServer getServer();
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void onInit(CallbackInfo ci) {
+    private void finiteStructures$onInit(CallbackInfo ci) {
         if (this.dimension() == Level.OVERWORLD) return;
-        this.initializeStructureLimitData();
+        this.finiteStructures$initializeStructureLimitData();
     }
 
     @Unique
     @Override
-    public void initializeStructureLimitData() {
+    public void finiteStructures$initializeStructureLimitData() {
         StructureLimitData data = this.getDataStorage().computeIfAbsent(StructureLimitData.TYPE);
         if (!data.isInitialized()) {
-            data = StructureLimitData.create((ServerLevel) (Object) this, ((MinecraftServerMixin) this.getServer()).getStructureCountLimitManager());
+            data = StructureLimitData.create((ServerLevel) (Object) this, ((MinecraftServerMixin) this.getServer()).finiteStructures$getStructureCountLimitManager());
             this.getDataStorage().set(StructureLimitData.TYPE, data);
         }
-        ((StructureLimitDataUser) this.structureCheck).setStructureLimitData(data);
-        ((StructureLimitDataUser) this.chunkSource.getGenerator()).setStructureLimitData(data);
+        ((StructureLimitDataUser) this.structureCheck).finiteStructures$setStructureLimitData(data);
+        ((StructureLimitDataUser) this.chunkSource.getGenerator()).finiteStructures$setStructureLimitData(data);
     }
 }

@@ -42,12 +42,12 @@ public abstract class ChunkGeneratorMixin implements StructureLimitDataUser {
 
     @Unique
     @Override
-    public void setStructureLimitData(StructureLimitData structureLimitData) {
+    public void finiteStructures$setStructureLimitData(StructureLimitData structureLimitData) {
         this.structureLimitData = structureLimitData;
     }
 
     @Inject(method = "findNearestMapStructure", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/SectionPos;blockToSectionCoord(I)I", ordinal = 0), cancellable = true)
-    public void findNearestMapStructureFaster(ServerLevel serverLevel, HolderSet<Structure> holderSet, BlockPos blockPos, int i, boolean bl, CallbackInfoReturnable<Pair<BlockPos, Holder<Structure>>> cir, @Local List<Map.Entry<StructurePlacement, Set<Holder<Structure>>>> list) {
+    public void finiteStructures$findNearestMapStructureFaster(ServerLevel serverLevel, HolderSet<Structure> holderSet, BlockPos blockPos, int i, boolean bl, CallbackInfoReturnable<Pair<BlockPos, Holder<Structure>>> cir, @Local List<Map.Entry<StructurePlacement, Set<Holder<Structure>>>> list) {
         for (Holder<Structure> holder : holderSet) {
             if (!structureLimitData.isLimited(holder)) return;
 
@@ -71,12 +71,12 @@ public abstract class ChunkGeneratorMixin implements StructureLimitDataUser {
     @Definition(id = "pair3", local = @Local(type = Pair.class, name = "pair3"))
     @Expression("pair = pair3")
     @Inject(method = "findNearestMapStructure", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
-    public void storeSuccessfulPlacement(ServerLevel serverLevel, HolderSet<Structure> holderSet, BlockPos blockPos, int i, boolean bl, CallbackInfoReturnable<Pair<BlockPos, Holder<Structure>>> cir, @Local RandomSpreadStructurePlacement placement) {
+    public void finiteStructures$storeSuccessfulPlacement(ServerLevel serverLevel, HolderSet<Structure> holderSet, BlockPos blockPos, int i, boolean bl, CallbackInfoReturnable<Pair<BlockPos, Holder<Structure>>> cir, @Local RandomSpreadStructurePlacement placement) {
         this.successfulPlacement = placement;
     }
 
     @Inject(method = "findNearestMapStructure", at = @At(value = "RETURN", ordinal = 2), cancellable = true)
-    public void saveFoundMapStructure(ServerLevel serverLevel, HolderSet<Structure> holderSet, BlockPos blockPos, int i, boolean bl, CallbackInfoReturnable<Pair<BlockPos, Holder<Structure>>> cir) {
+    public void finiteStructures$saveFoundMapStructure(ServerLevel serverLevel, HolderSet<Structure> holderSet, BlockPos blockPos, int i, boolean bl, CallbackInfoReturnable<Pair<BlockPos, Holder<Structure>>> cir) {
         if (this.structureLimitData != null && this.successfulPlacement != null) {
             Vec3i locateOffset = ((StructurePlacementAccessor)successfulPlacement).getLocateOffset();
             Vec3i invertedOffset = locateOffset.multiply(-1);
@@ -88,7 +88,7 @@ public abstract class ChunkGeneratorMixin implements StructureLimitDataUser {
     }
 
     @Inject(method = "tryGenerateStructure", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/StructureManager;setStartForStructure(Lnet/minecraft/core/SectionPos;Lnet/minecraft/world/level/levelgen/structure/Structure;Lnet/minecraft/world/level/levelgen/structure/StructureStart;Lnet/minecraft/world/level/chunk/StructureAccess;)V"), cancellable = true)
-    public void onTryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkAccess chunkAccess, ChunkPos chunkPos, SectionPos sectionPos, ResourceKey<Level> resourceKey, CallbackInfoReturnable<Boolean> cir, @Local Structure structure) {
+    public void finiteStructures$nTryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkAccess chunkAccess, ChunkPos chunkPos, SectionPos sectionPos, ResourceKey<Level> resourceKey, CallbackInfoReturnable<Boolean> cir, @Local Structure structure) {
         if (this.structureLimitData != null) {
             Registry<Structure> registry = registryAccess.lookupOrThrow(Registries.STRUCTURE);
             Identifier key = registry.getKey(structure);

@@ -28,12 +28,12 @@ public abstract class StructureCheckMixin implements StructureLimitDataUser {
 
     @Unique
     @Override
-    public void setStructureLimitData(StructureLimitData structureLimitData) {
+    public void finiteStructures$setStructureLimitData(StructureLimitData structureLimitData) {
         this.structureLimitData = structureLimitData;
     }
 
     @Inject(method = "canCreateStructure", at = @At("RETURN"), cancellable = true)
-    private void canCreateStructure(ChunkPos chunkPos, Structure structure, CallbackInfoReturnable<Boolean> cir) {
+    private void finiteStructures$canCreateStructure(ChunkPos chunkPos, Structure structure, CallbackInfoReturnable<Boolean> cir) {
         if (this.structureLimitData != null) {
             Registry<Structure> registry = this.registryAccess.lookupOrThrow(Registries.STRUCTURE);
             Identifier key = registry.getKey(structure);

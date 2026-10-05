@@ -23,17 +23,17 @@ public abstract class MinecraftServerMixin implements net.mesomods.finitestructu
 
     @Unique
     @Override
-    public StructureCountLimitManager getStructureCountLimitManager() {
+    public StructureCountLimitManager finiteStructures$getStructureCountLimitManager() {
         return this.structureCountLimitManager;
     }
 
     @Inject(method = "createLevels", at = @At("HEAD"))
-    public void onCreateLevels(CallbackInfo ci) {
+    public void finiteStructures$onCreateLevels(CallbackInfo ci) {
         this.structureCountLimitManager = new StructureCountLimitManager(this.registryAccess());
     }
 
     @Inject(method = "createLevels", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;getRandomSequences()Lnet/minecraft/world/RandomSequences;"))
-    public void initOverworldStructureLimitData(CallbackInfo ci, @Local ServerLevel overworld) {
-        ((ServerLevelMixin)overworld).initializeStructureLimitData();
+    public void finiteStructures$initOverworldStructureLimitData(CallbackInfo ci, @Local ServerLevel overworld) {
+        ((ServerLevelMixin)overworld).finiteStructures$initializeStructureLimitData();
     }
 }
