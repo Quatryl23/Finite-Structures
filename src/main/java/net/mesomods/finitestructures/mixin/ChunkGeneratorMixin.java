@@ -8,7 +8,6 @@ import net.mesomods.finitestructures.StructureLimitData;
 import net.mesomods.finitestructures.notmixin.StructureLimitDataUser;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -64,7 +63,7 @@ public abstract class ChunkGeneratorMixin implements StructureLimitDataUser {
                 }
             }
         }
-            cir.setReturnValue(find);
+        cir.setReturnValue(find);
     }
 
     @Definition(id = "pair", local = @Local(type = Pair.class, name = "pair"))
@@ -78,7 +77,7 @@ public abstract class ChunkGeneratorMixin implements StructureLimitDataUser {
     @Inject(method = "findNearestMapStructure", at = @At(value = "RETURN", ordinal = 2), cancellable = true)
     public void finiteStructures$saveFoundMapStructure(ServerLevel serverLevel, HolderSet<Structure> holderSet, BlockPos blockPos, int i, boolean bl, CallbackInfoReturnable<Pair<BlockPos, Holder<Structure>>> cir) {
         if (this.structureLimitData != null && this.successfulPlacement != null) {
-            Vec3i locateOffset = ((StructurePlacementAccessor)successfulPlacement).getLocateOffset();
+            Vec3i locateOffset = ((StructurePlacementAccessor) successfulPlacement).getLocateOffset();
             Vec3i invertedOffset = locateOffset.multiply(-1);
             ChunkPos chunkPos = new ChunkPos(cir.getReturnValue().getFirst().offset(invertedOffset));
             if (!structureLimitData.allowStructureAtPosition(cir.getReturnValue().getSecond(), chunkPos, true)) {
