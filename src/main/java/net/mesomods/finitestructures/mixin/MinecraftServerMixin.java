@@ -32,7 +32,7 @@ public abstract class MinecraftServerMixin implements net.mesomods.finitestructu
         this.finiteStructures$structureCountLimitManager = new StructureCountLimitManager(this.registryAccess());
     }
 
-    @Inject(method = "createLevels", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/CommandStorage;<init>(Lnet/minecraft/world/level/storage/SavedDataStorage;)V"))
+    @Inject(method = "createLevels", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/progress/LevelLoadListener;updateFocus(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/ChunkPos;)V", shift = At.Shift.AFTER))
     public void finiteStructures$initOverworldStructureLimitData(CallbackInfo ci, @Local(name = "overworld") ServerLevel overworld) {
         ((ServerLevelMixin)overworld).finiteStructures$initializeStructureLimitData();
     }
