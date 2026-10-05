@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "finite_structures",
+  "version": "${version}",
+  "name": "Finite Structures",
+  "description": "Data-driven structure count limiting",
+  "authors": ["Mesophil"],
+  "contact": {
+    "homepage": "https://github.com/Quatryl23",
+    "issues": "https://github.com/Quatryl23/Finite-Structures/issues",
+    "sources": "https://github.com/Quatryl23/Finite-Structures"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.mesomods.finitestructures.FiniteStructures"
+    ]
+  },
+  "mixins": [
+    "finite_structures.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
