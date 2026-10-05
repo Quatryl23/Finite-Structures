@@ -66,8 +66,8 @@ public abstract class ChunkGeneratorMixin implements StructureLimitDataUser {
         cir.setReturnValue(find);
     }
 
-    @Definition(id = "pair", local = @Local(type = Pair.class, name = "pair"))
-    @Definition(id = "pair3", local = @Local(type = Pair.class, name = "pair3"))
+    @Definition(id = "pair", local = @Local(type = Pair.class, ordinal = 0))
+    @Definition(id = "pair3", local = @Local(type = Pair.class, index = 20))
     @Expression("pair = pair3")
     @Inject(method = "findNearestMapStructure", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
     public void finiteStructures$storeSuccessfulPlacement(ServerLevel serverLevel, HolderSet<Structure> holderSet, BlockPos blockPos, int i, boolean bl, CallbackInfoReturnable<Pair<BlockPos, Holder<Structure>>> cir, @Local RandomSpreadStructurePlacement placement) {
