@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin implements net.mesomods.finitestructures.notmixin.MinecraftServerMixin {
     @Unique
-    private StructureCountLimitManager structureCountLimitManager;
+    private StructureCountLimitManager finiteStructures$structureCountLimitManager;
 
     @Shadow
     public abstract RegistryAccess.Frozen registryAccess();
@@ -24,12 +24,12 @@ public abstract class MinecraftServerMixin implements net.mesomods.finitestructu
     @Unique
     @Override
     public StructureCountLimitManager finiteStructures$getStructureCountLimitManager() {
-        return this.structureCountLimitManager;
+        return this.finiteStructures$structureCountLimitManager;
     }
 
     @Inject(method = "createLevels", at = @At("HEAD"))
     public void finiteStructures$onCreateLevels(CallbackInfo ci) {
-        this.structureCountLimitManager = new StructureCountLimitManager(this.registryAccess());
+        this.finiteStructures$structureCountLimitManager = new StructureCountLimitManager(this.registryAccess());
     }
 
     @Inject(method = "createLevels", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;getRandomSequences()Lnet/minecraft/world/RandomSequences;"))
