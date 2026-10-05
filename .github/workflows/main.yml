@@ -17,9 +17,8 @@ jobs:
           java-version: 25
           distribution: oracle-openjdk
 
-      - name: Prepare Gradle Wrapper
-        if: ${{ runner.os != 'Windows' }}
-        run: chmod +x ./gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Build
         run: ./gradlew clean build
