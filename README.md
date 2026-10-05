@@ -1,4 +1,4 @@
-# Finite-Structures
+# Finite Structures Mod
 Data-driven structure count limiting in Minecraft
 
 
@@ -9,6 +9,7 @@ File extension: `.json`
 ```
 {
   "target": "#wonders:wonder",
+  "dimension": "minecraft:overworld",
   "count": 7,
   "priority": 0,
   "group_mode": "group",
@@ -25,6 +26,14 @@ File extension: `.json`
 - A structure, structure tag or list of structures
 - Required
 - Examples: `"#minecraft:village"`, `"minecraft:mansion"`, `["minecraft:desert_pyramid","minecraft:jungle_pyramid"]`
+
+`dimension`: The dimensions in which the targeted structures are limited. By default, the limit applies to all dimensions, limiting the
+targeted structures seperately for every dimension. Structures that don't generate in a dimension are ignored in that dimension. By defining
+targeted dimensions, you can, especially if you're using `limit_mode` `found_first`, improve the performance and used storage for modpacks with
+a lot of dimensions (minimal difference with only vanilla dimensions)
+- A dimension or list of dimensions
+- Optional, defaults to all dimensions
+- Examples: `"minecraft:overworld"`, `["minecraft:the_nether", "minecraft:the_end"]`
   
 `count`: The number of structures you want to be generated. The resulting count of the provider is clamped between 0 and 1024
 - A [Number Provider](https://minecraft.wiki/w/Number_provider)
