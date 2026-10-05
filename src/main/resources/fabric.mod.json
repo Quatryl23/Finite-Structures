@@ -11,7 +11,7 @@
     "sources": "https://github.com/Quatryl23/Finite-Structures"
   },
   "license": "MIT",
-  "environment": "*",
+  "environment": "server",
   "entrypoints": {
     "main": [
       "net.mesomods.finitestructures.FiniteStructures"
