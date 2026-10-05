@@ -15,6 +15,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProviders;
+import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
 import java.util.*;
@@ -233,7 +234,11 @@ public class StructureCountLimit {
         public BlockPos getCenter(ServerLevel level, LootContext context) {
             BlockPos pos = source == CenterSource.SPAWN ? level.getRespawnData().pos() : BlockPos.ZERO;
             double multiplier = 1.0 / level.dimensionType().coordinateScale();
-            return BlockPos.containing(offset(pos, context).getCenter().multiply(multiplier, 1, multiplier));
+            return BlockPos.containing(getCenter(offset(pos, context)).multiply(multiplier, 1, multiplier));
+        }
+
+        private Vec3 getCenter(BlockPos pos) {
+            return new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
         }
 
         private BlockPos offset(BlockPos pos, LootContext context) {
