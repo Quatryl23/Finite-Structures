@@ -139,7 +139,7 @@ public class StructureLimitData extends SavedData {
 
     public static class Positions {
         public static final Codec<Positions> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.list(ChunkPos.CODEC).xmap(list -> (Set<ChunkPos>) list.stream().collect(Collectors.toCollection(ConcurrentHashMap::newKeySet)), set -> set.stream().toList()).fieldOf("positions").forGetter(Positions::getPositions),
+                Codec.list(BlockPos.CODEC.xmap(ChunkPos::new, ChunkPos::getWorldPosition)).xmap(list -> (Set<ChunkPos>) list.stream().collect(Collectors.toCollection(ConcurrentHashMap::newKeySet)), set -> set.stream().toList()).fieldOf("positions").forGetter(Positions::getPositions),
                 Codec.INT.optionalFieldOf("remaining", 0).forGetter(Positions::getRemaining)
         ).apply(instance, Positions::new));
         private final Set<ChunkPos> positions;

@@ -14,7 +14,7 @@ public class StructureCountLimitManager {
 
     public StructureCountLimitManager(RegistryAccess access) {
         Map<Holder<Structure>, StructureCountLimit.Rule> structureLimits = new HashMap<>();
-        Optional<Registry<StructureCountLimit>> registry = access.lookup(FiniteStructureRegistries.STRUCTURE_LIMITS_REGISTRY_KEY);
+        Optional<Registry<StructureCountLimit>> registry = access.registry(FiniteStructureRegistries.STRUCTURE_LIMITS_REGISTRY_KEY);
         registry.ifPresent(reg -> {
             List<StructureCountLimit> sorted = reg.stream().sorted(
                     Comparator.comparingInt(StructureCountLimit::getPriority)
