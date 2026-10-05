@@ -1,6 +1,7 @@
 # Finite Structures Mod
-Data-driven structure count limiting in Minecraft
-
+- Data packs can define Structure Limits to limit the amount of structures of a specified type that generate.
+- The structure locations are stored which makes /locate and Explorer Map generation faster for these structures
+- Fixes [MC-177381](https://mojira.dev/MC-177381) to return the correct distances on /locate
 
 # Structure Limit Syntax
 Path in datapack: `data/<namespace>/worldgen/structure_limit`
