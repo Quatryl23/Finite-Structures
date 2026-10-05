@@ -91,9 +91,7 @@ public abstract class ChunkGeneratorMixin implements StructureLimitDataUser {
     public void finiteStructures$nTryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkAccess chunkAccess, ChunkPos chunkPos, SectionPos sectionPos, ResourceKey<Level> resourceKey, CallbackInfoReturnable<Boolean> cir, @Local Structure structure) {
         if (this.structureLimitData != null) {
             Registry<Structure> registry = registryAccess.lookupOrThrow(Registries.STRUCTURE);
-            Identifier key = registry.getKey(structure);
-            if (key == null) return;
-            if (!structureLimitData.allowStructureAtPosition(registry.get(key).get(), chunkPos, true)) {
+            if (!structureLimitData.allowStructureAtPosition(registry.wrapAsHolder(structure), chunkPos, true)) {
                 cir.setReturnValue(false);
             }
         }
