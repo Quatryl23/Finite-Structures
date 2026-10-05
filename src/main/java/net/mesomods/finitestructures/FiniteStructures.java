@@ -1,20 +1,16 @@
 package net.mesomods.finitestructures;
 
-import net.fabricmc.api.ModInitializer;
-import net.minecraft.resources.Identifier;
+import com.mojang.logging.LogUtils;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class FiniteStructures implements ModInitializer {
+@Mod(FiniteStructures.MODID)
+public class FiniteStructures {
     public static final String MODID = "finite_structures";
-    public static final Logger LOGGER = LoggerFactory.getLogger("Finite Structures Mod");
+    private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static Identifier id(String path) {
-        return Identifier.fromNamespaceAndPath(MODID, path);
-    }
-
-    @Override
-    public void onInitialize() {
-        FiniteStructureRegistries.initialize();
+    public FiniteStructures(IEventBus modEventBus, ModContainer modContainer) {
     }
 }

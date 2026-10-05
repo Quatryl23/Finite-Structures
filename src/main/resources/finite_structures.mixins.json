@@ -3,17 +3,7 @@
   "minVersion": "0.8",
   "package": "net.mesomods.finitestructures.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixinextras": {
-    "minVersion": "0.5.5"
-  },
   "mixins": [
-    "ChunkGeneratorMixin",
-    "LevelMixin",
-    "LocateCommandMixin",
-    "MinecraftServerMixin",
-    "ServerLevelMixin",
-    "StructureCheckMixin",
-    "StructurePlacementAccessor"
   ],
   "client": [
   ],
