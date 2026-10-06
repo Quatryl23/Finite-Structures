@@ -34,5 +34,3 @@ jobs:
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           changelog-file: CHANGELOG.md
           environment: server
-          game-versions: |
-            >=1.21.0 <=1.21.1
