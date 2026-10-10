@@ -7,10 +7,10 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 
-@EventBusSubscriber
+@EventBusSubscriber(bus =  EventBusSubscriber.Bus.MOD)
 public class FiniteStructureRegistries {
     public static final ResourceKey<Registry<StructureCountLimit>> STRUCTURE_LIMITS_REGISTRY_KEY =
-            ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("worldgen","structure_limit"));
+            ResourceKey.createRegistryKey(new ResourceLocation("worldgen","structure_limit"));
 
     @SubscribeEvent
     public static void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
