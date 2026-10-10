@@ -1,5 +1,9 @@
 name: Publish on CurseForge and Modrinth
-on: [push, workflow_dispatch]
+on:
+  push:
+    paths:
+      - 'gradle.properties'
+  workflow_dispatch:
 jobs:
   build:
     permissions: 
