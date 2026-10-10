@@ -16,6 +16,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin extends LevelMixin implements net.mesomods.finitestructures.notmixin.ServerLevelMixin {
@@ -41,7 +44,10 @@ public abstract class ServerLevelMixin extends LevelMixin implements net.mesomod
     @Unique
     @Override
     public void finiteStructures$initializeStructureLimitData() {
-        StructureLimitData data = this.getDataStorage().computeIfAbsent(StructureLimitData.TYPE, StructureLimitData.ID);
+        StructureLimitData data = this.getDataStorage().computeIfAbsent(
+                StructureLimitData::load,
+                () -> new StructureLimitData(false, new HashMap<>(), new ArrayList<>()),
+                StructureLimitData.ID);
         if (!data.isInitialized()) {
             data = StructureLimitData.create((ServerLevel) (Object) this, ((MinecraftServerMixin) this.getServer()).finiteStructures$getStructureCountLimitManager());
             data.setDirty();

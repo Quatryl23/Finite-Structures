@@ -34,15 +34,11 @@ public class StructureLimitData extends SavedData {
             Codec.list(Codec.list(Structure.CODEC).xmap(list -> (Set<Holder<Structure>>) list.stream().collect(Collectors.toCollection(ConcurrentHashMap::newKeySet)), set -> set.stream().toList())).fieldOf("synchronized").forGetter(StructureLimitData::getSynchronizedSets)
     ).apply(instance, StructureLimitData::new));
     private static HolderLookup.Provider lookupProvider;
-    public static final SavedData.Factory<StructureLimitData> TYPE = new SavedData.Factory<>(
-            () -> new StructureLimitData(false, new HashMap<>(), new ArrayList<>()),
-            StructureLimitData::load,
-            null);
     private final boolean initialized;
     private final Map<Holder<Structure>, Positions> structurePositions;
     private final List<Set<Holder<Structure>>> synchronizedSets;
 
-    StructureLimitData(boolean initialized, Map<Holder<Structure>, Positions> structurePositions, List<Set<Holder<Structure>>> synchronizedSets) {
+    public StructureLimitData(boolean initialized, Map<Holder<Structure>, Positions> structurePositions, List<Set<Holder<Structure>>> synchronizedSets) {
         this.initialized = initialized;
         this.structurePositions = structurePositions;
         this.synchronizedSets = new CopyOnWriteArrayList<>(synchronizedSets);

@@ -7,6 +7,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProviders;
+import org.intellij.lang.annotations.Identifier;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,7 +31,7 @@ public class StructureCountLimit {
             GroupMode.CODEC.optionalFieldOf("group_mode", GroupMode.SEPARATE).forGetter(StructureCountLimit::getGroupMode),
             GroupRule.MemberOverrideReaction.CODEC.optionalFieldOf("override_mode", GroupRule.MemberOverrideReaction.REDUCE_COUNT).forGetter(StructureCountLimit::getOverrideReaction),
             LimitMode.CODEC.optionalFieldOf("limit_mode", LimitMode.NEAREST).forGetter(StructureCountLimit::getLimitMode),
-            NumberProviders.CODEC.fieldOf("count").forGetter(StructureCountLimit::getCount),
+            Codec.INT.fieldOf("count").forGetter(StructureCountLimit::getCount),
             CenterPos.CODEC.optionalFieldOf("center", CenterPos.DEFAULT).forGetter(StructureCountLimit::getCenter)
     ).apply(instance, StructureCountLimit::new));
     private final HolderSet<Structure> structure;
@@ -38,7 +40,7 @@ public class StructureCountLimit {
     private final GroupRule.MemberOverrideReaction memberOverrideReaction;
     private final Rule rule;
 
-    public StructureCountLimit(HolderSet<Structure> structure, int priority, GroupMode groupMode, GroupRule.MemberOverrideReaction memberOverrideReaction, LimitMode limitMode, NumberProvider count, CenterPos center) {
+    public StructureCountLimit(HolderSet<Structure> structure, int priority, GroupMode groupMode, GroupRule.MemberOverrideReaction memberOverrideReaction, LimitMode limitMode, int count, CenterPos center) {
         this.structure = structure;
         this.priority = priority;
         this.groupMode = groupMode;
@@ -54,7 +56,7 @@ public class StructureCountLimit {
         return structure;
     }
 
-    public NumberProvider getCount() {
+    public int getCount() {
         return rule.count;
     }
 
@@ -113,18 +115,18 @@ public class StructureCountLimit {
     }
 
     public abstract static class Rule {
-        protected final NumberProvider count;
+        protected final int count;
         protected final CenterPos center;
         protected final LimitMode limitMode;
 
-        public Rule(NumberProvider count, CenterPos center, LimitMode limitMode) {
+        public Rule(int count, CenterPos center, LimitMode limitMode) {
             this.count = count;
             this.center = center;
             this.limitMode = limitMode;
         }
 
         public static LootContext createContext(ServerLevel level) {
-            return new LootContext.Builder(new LootParams.Builder(level).create(new LootContextParamSet.Builder().build())).create(Optional.empty());
+            return new LootContext.Builder(new LootParams.Builder(level).create(new LootContextParamSet.Builder().build())).create(null);
         }
 
         public boolean isLocated() {
@@ -133,7 +135,7 @@ public class StructureCountLimit {
 
         public int resolveCount(ServerLevel level) {
             LootContext context = createContext(level);
-            return Mth.clamp(count.getInt(context), 0, 1024);
+            return Mth.clamp(count, 0, 1024);
         }
 
         public abstract boolean isGroup();
@@ -149,7 +151,7 @@ public class StructureCountLimit {
         private final HolderSet<Structure> holderSet;
         private Set<Holder<Structure>> structures;
 
-        public SingleRule(NumberProvider count, CenterPos center, LimitMode limitMode, HolderSet<Structure> structures) {
+        public SingleRule(int count, CenterPos center, LimitMode limitMode, HolderSet<Structure> structures) {
             super(count, center, limitMode);
             this.holderSet = structures;
         }
@@ -189,7 +191,7 @@ public class StructureCountLimit {
         private int originalSize;
         private final MemberOverrideReaction reaction;
 
-        public GroupRule(NumberProvider count, CenterPos center, LimitMode limitMode, HolderSet<Structure> holderSet, MemberOverrideReaction reaction) {
+        public GroupRule(int count, CenterPos center, LimitMode limitMode, HolderSet<Structure> holderSet, MemberOverrideReaction reaction) {
             super(count, center, limitMode);
             this.holderSet = holderSet;
             this.reaction = reaction;
@@ -217,7 +219,7 @@ public class StructureCountLimit {
         public int resolveCount(ServerLevel level) {
             LootContext context = createContext(level);
             double multiplier = (reaction == MemberOverrideReaction.REDUCE_COUNT) ? (double) group.size() / (double) originalSize : 1.0;
-            return (int) Mth.clamp(Math.round(count.getInt(context) * multiplier), 0, 1024);
+            return (int) Mth.clamp(Math.round(count * multiplier), 0, 1024);
         }
 
         @Override
@@ -255,17 +257,15 @@ public class StructureCountLimit {
     public static class CenterPos {
         public static final Codec<CenterPos> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 CenterSource.CODEC.fieldOf("source").forGetter(CenterPos::getSource),
-                NumberProviders.CODEC.optionalFieldOf("offset_x").forGetter(CenterPos::getX),
-                NumberProviders.CODEC.optionalFieldOf("offset_z").forGetter(CenterPos::getZ)
+                Codec.INT.optionalFieldOf("offset_x", 0).forGetter(CenterPos::getX),
+                Codec.INT.optionalFieldOf("offset_z", 0).forGetter(CenterPos::getZ)
         ).apply(instance, CenterPos::new));
-        public static final CenterPos DEFAULT = new CenterPos(CenterSource.SPAWN, Optional.empty(), Optional.empty());
+        public static final CenterPos DEFAULT = new CenterPos(CenterSource.SPAWN, 0, 0);
         private final CenterSource source;
-        private final Optional<NumberProvider> x;
-        private final Optional<NumberProvider> z;
-        private Integer resolved_x;
-        private Integer resolved_z;
+        private final int x;
+        private final int z;
 
-        CenterPos(CenterSource source, Optional<NumberProvider> x, Optional<NumberProvider> z) {
+        CenterPos(CenterSource source, int x, int z) {
             this.source = source;
             this.x = x;
             this.z = z;
@@ -278,20 +278,14 @@ public class StructureCountLimit {
         }
 
         private BlockPos offset(BlockPos pos, LootContext context) {
-            if (resolved_x == null) {
-                resolved_x = x.orElse(ConstantValue.exactly(0)).getInt(context);
-            }
-            if (resolved_z == null) {
-                resolved_z = z.orElse(ConstantValue.exactly(0)).getInt(context);
-            }
-            return pos.offset(resolved_x, 0, resolved_z);
+            return pos.offset(x, 0, z);
         }
 
-        public Optional<NumberProvider> getZ() {
+        public int getZ() {
             return z;
         }
 
-        public Optional<NumberProvider> getX() {
+        public int getX() {
             return x;
         }
 
