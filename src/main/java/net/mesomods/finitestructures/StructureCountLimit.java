@@ -7,7 +7,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
@@ -16,12 +15,11 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
-import net.minecraft.world.level.storage.loot.providers.number.NumberProviders;
-import org.intellij.lang.annotations.Identifier;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class StructureCountLimit {
@@ -187,9 +185,9 @@ public class StructureCountLimit {
 
     public static class GroupRule extends Rule {
         private final HolderSet<Structure> holderSet;
+        private final MemberOverrideReaction reaction;
         private Set<Holder<Structure>> group;
         private int originalSize;
-        private final MemberOverrideReaction reaction;
 
         public GroupRule(int count, CenterPos center, LimitMode limitMode, HolderSet<Structure> holderSet, MemberOverrideReaction reaction) {
             super(count, center, limitMode);
