@@ -123,16 +123,11 @@ public class StructureCountLimit {
             this.limitMode = limitMode;
         }
 
-        public static LootContext createContext(ServerLevel level) {
-            return new LootContext.Builder(new LootParams.Builder(level).create(new LootContextParamSet.Builder().build())).create(null);
-        }
-
         public boolean isLocated() {
             return limitMode == LimitMode.NEAREST;
         }
 
         public int resolveCount(ServerLevel level) {
-            LootContext context = createContext(level);
             return Mth.clamp(count, 0, 1024);
         }
 
@@ -168,9 +163,8 @@ public class StructureCountLimit {
 
         public Map<Holder<Structure>, Set<ChunkPos>> apply(ServerLevel level) {
             Map<Holder<Structure>, Set<ChunkPos>> positions = new HashMap<>();
-            LootContext context = createContext(level);
             for (Holder<Structure> structure : this.getStructures()) {
-                BlockPos pos = center.getCenter(level, context);
+                BlockPos pos = center.getCenter(level);
                 LocatedStructurePositions found = StructureFinder.findNearestStructures(Set.of(structure), level, pos, resolveCount(level));
                 if (found != null) positions.putAll(found.getPositions());
             }
@@ -215,15 +209,13 @@ public class StructureCountLimit {
 
         @Override
         public int resolveCount(ServerLevel level) {
-            LootContext context = createContext(level);
             double multiplier = (reaction == MemberOverrideReaction.REDUCE_COUNT) ? (double) group.size() / (double) originalSize : 1.0;
             return (int) Mth.clamp(Math.round(count * multiplier), 0, 1024);
         }
 
         @Override
         public Map<Holder<Structure>, Set<ChunkPos>> apply(ServerLevel level) {
-            LootContext context = createContext(level);
-            BlockPos pos = center.getCenter(level, context);
+            BlockPos pos = center.getCenter(level);
             LocatedStructurePositions found = StructureFinder.findNearestStructures(group, level, pos, resolveCount(level));
             return found == null ? Map.of() : found.getPositions();
         }
@@ -269,13 +261,13 @@ public class StructureCountLimit {
             this.z = z;
         }
 
-        public BlockPos getCenter(ServerLevel level, LootContext context) {
+        public BlockPos getCenter(ServerLevel level) {
             BlockPos pos = source == CenterSource.SPAWN ? level.getSharedSpawnPos() : BlockPos.ZERO;
             double multiplier = 1.0 / level.dimensionType().coordinateScale();
-            return BlockPos.containing(offset(pos, context).getCenter().multiply(multiplier, 1, multiplier));
+            return BlockPos.containing(offset(pos).getCenter().multiply(multiplier, 1, multiplier));
         }
 
-        private BlockPos offset(BlockPos pos, LootContext context) {
+        private BlockPos offset(BlockPos pos) {
             return pos.offset(x, 0, z);
         }
 
