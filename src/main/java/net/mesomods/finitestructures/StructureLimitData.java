@@ -31,8 +31,9 @@ public class StructureLimitData extends SavedData {
     public static final Codec<StructureLimitData> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             Codec.BOOL.fieldOf("initialized").forGetter(StructureLimitData::isInitialized),
             Codec.unboundedMap(Structure.CODEC, Positions.CODEC).fieldOf("positions").forGetter(StructureLimitData::getStructurePositions),
-            Codec.list(Codec.list(Structure.CODEC).xmap(list -> (Set<Holder<Structure>>) list.stream().collect( Collectors.toCollection(ConcurrentHashMap::newKeySet)), set -> set.stream().toList())).fieldOf("synchronized").forGetter(StructureLimitData::getSynchronizedSets)
+            Codec.list(Codec.list(Structure.CODEC).xmap(list -> (Set<Holder<Structure>>) list.stream().collect(Collectors.toCollection(ConcurrentHashMap::newKeySet)), set -> set.stream().toList())).fieldOf("synchronized").forGetter(StructureLimitData::getSynchronizedSets)
     ).apply(instance, StructureLimitData::new));
+    private static HolderLookup.Provider lookupProvider;
     public static final SavedData.Factory<StructureLimitData> TYPE = new SavedData.Factory<>(
             () -> new StructureLimitData(false, new HashMap<>(), new ArrayList<>()),
             StructureLimitData::load,
@@ -127,14 +128,19 @@ public class StructureLimitData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
-        DataResult<Tag> result = CODEC.encodeStart(RegistryOps.create(NbtOps.INSTANCE, provider), this);
-        return tag.merge((CompoundTag) result.getOrThrow());
+    public CompoundTag save(CompoundTag tag) {
+        DataResult<Tag> result = CODEC.encodeStart(RegistryOps.create(NbtOps.INSTANCE, lookupProvider), this);
+        return tag.merge((CompoundTag) result.getOrThrow(false, string -> {}));
     }
 
-    public static StructureLimitData load(CompoundTag tag, HolderLookup.Provider provider) {
-        DataResult<StructureLimitData> result = CODEC.parse(RegistryOps.create(NbtOps.INSTANCE, provider), tag);
-        return result.getOrThrow();
+    public static StructureLimitData load(CompoundTag tag) {
+        DataResult<StructureLimitData> result = CODEC.parse(RegistryOps.create(NbtOps.INSTANCE, lookupProvider), tag);
+        return result.getOrThrow(false, string -> {
+        });
+    }
+
+    public static void setLookupProvider(HolderLookup.Provider lookupProvider) {
+        StructureLimitData.lookupProvider = lookupProvider;
     }
 
     public static class Positions {
