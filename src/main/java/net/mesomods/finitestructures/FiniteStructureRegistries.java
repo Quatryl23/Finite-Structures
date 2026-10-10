@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceKey;
 
 public class FiniteStructureRegistries {
     public static final ResourceKey<Registry<StructureCountLimit>> STRUCTURE_LIMITS_REGISTRY_KEY =
-            ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("worldgen", "structure_limit"));
+            ResourceKey.createRegistryKey(new ResourceLocation("worldgen", "structure_limit"));
 
     public static void initialize() {
         DynamicRegistries.register(STRUCTURE_LIMITS_REGISTRY_KEY, StructureCountLimit.CODEC);

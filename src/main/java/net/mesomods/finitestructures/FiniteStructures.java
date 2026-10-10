@@ -10,7 +10,7 @@ public class FiniteStructures implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("Finite Structures Mod");
 
     public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+        return new ResourceLocation(MODID, path);
     }
 
     @Override
