@@ -16,7 +16,7 @@ base {
     archivesName = archives_base_name
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 legacyForge {
     // Specify the version of NeoForge to use.
