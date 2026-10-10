@@ -28,7 +28,7 @@ File extension: `.json`
 - Examples: `"#minecraft:village"`, `"minecraft:mansion"`, `["minecraft:desert_pyramid","minecraft:jungle_pyramid"]`
 
 `count`: The number of structures you want to be generated. The resulting count of the provider is clamped between 0 and 1024
-- A [Number Provider](https://minecraft.wiki/w/Number_provider)
+- A [Number Provider](https://minecraft.wiki/w/Number_provider) (integer until 1.20.1)*
 - Required
 - Examples: `1`, `{"type":"uniform","min":1,"max":2}`, `{"type":"binomial","n":{"type":"uniform","min":13,"max":23},"p":0.5}`
 
@@ -71,12 +71,12 @@ to the `center` position in the Overworld. (For example, a `center` position of 
 - Optional, defaults to `"spawn"`
 
 `x_offset`: The offset to apply to the `source` position in x-direction
-- A [Number Provider](https://minecraft.wiki/w/Number_provider)
+- A [Number Provider](https://minecraft.wiki/w/Number_provider) (integer until 1.20.1)*
 - Optional, defaults to `0`
 - Examples: `0`, `-12000`, `{"type":"uniform","min":-30000000,"max":30000000}`, `{"type":"binomial","n":{"type":"uniform","min":10000,"max":2000000},"p":0.99}`
 
 `z_offset`: The offset to apply to the `source` position in z-direction
-- A [Number Provider](https://minecraft.wiki/w/Number_provider)
+- A [Number Provider](https://minecraft.wiki/w/Number_provider) (integer until 1.20.1)*
 - Optional, defaults to `0`
 - Examples: `0`, `-12000`, `{"type":"uniform","min":-30000000,"max":30000000}`, `{"type":"binomial","n":{"type":"uniform","min":10000,"max":2000000},"p":0.99}`
 
@@ -152,3 +152,6 @@ but instead the first 0-41 mansions that are found by players.
 A random number between -1000 and 1000 is picked for both x and z coordinate to get a position, e.g. [x=-451, z=294]. The 120 villages nearest to that position
 will generate. If any village has another limit with a higher `priority` applied to it, however, the limit to villages will not apply (`remove_group`) and all
 villages not affected by any limit will generate normally.
+
+__\* Note: Versions 1.20.1 and below do not support [Number Providers](https://minecraft.wiki/w/Number_provider). All Number
+provider fields are replaced with integers for these versions.__
