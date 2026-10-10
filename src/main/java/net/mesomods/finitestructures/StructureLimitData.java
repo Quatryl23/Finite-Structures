@@ -16,7 +16,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -34,15 +34,11 @@ public class StructureLimitData extends SavedData {
             Codec.unboundedMap(Structure.CODEC, Positions.CODEC).fieldOf("positions").forGetter(StructureLimitData::getStructurePositions),
             Codec.list(Codec.list(Structure.CODEC).xmap(list -> (Set<Holder<Structure>>) list.stream().collect(Collectors.toCollection(ConcurrentHashMap::newKeySet)), set -> set.stream().toList())).fieldOf("synchronized").forGetter(StructureLimitData::getSynchronizedSets)
     ).apply(instance, StructureLimitData::new));
-    public static final SavedData.Factory<StructureLimitData> TYPE = new SavedData.Factory<>(
-            () -> new StructureLimitData(false, new HashMap<>(), new ArrayList<>()),
-            StructureLimitData::load,
-            null);
     private final boolean initialized;
     private final Map<Holder<Structure>, Positions> structurePositions;
     private final List<Set<Holder<Structure>>> synchronizedSets;
 
-    StructureLimitData(boolean initialized, Map<Holder<Structure>, Positions> structurePositions, List<Set<Holder<Structure>>> synchronizedSets) {
+    public StructureLimitData(boolean initialized, Map<Holder<Structure>, Positions> structurePositions, List<Set<Holder<Structure>>> synchronizedSets) {
         this.initialized = initialized;
         this.structurePositions = structurePositions;
         this.synchronizedSets = new CopyOnWriteArrayList<>(synchronizedSets);
