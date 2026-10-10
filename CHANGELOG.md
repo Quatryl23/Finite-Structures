@@ -1,2 +1,2 @@
-Version 1.0.1
-* Fixed startup crash in versions below 1.21
+Version 1.0.2
+* Fixed startup crash in neoforge 1.20.3
