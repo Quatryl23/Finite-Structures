@@ -12,7 +12,7 @@ import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureCheckResult;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -91,7 +91,7 @@ public class StructureFinder {
     }
 
     private static Pair<ChunkPos, Holder<Structure>> checkChunk(Holder<Structure> structure, LevelReader level, StructureManager manager, StructurePlacement placement, ChunkPos pos) {
-        StructureCheckResult checkResult = manager.checkStructurePresence(pos, structure.value(), placement, false);
+        StructureCheckResult checkResult = manager.checkStructurePresence(pos, structure.value(), false);
         if (checkResult == StructureCheckResult.CHUNK_LOAD_NEEDED) {
             ChunkAccess chunkAccess = level.getChunk(pos.x, pos.z, ChunkStatus.STRUCTURE_STARTS);
             StructureStart structureStart = manager.getStartForStructure(SectionPos.bottomOf(chunkAccess), structure.value(), chunkAccess);

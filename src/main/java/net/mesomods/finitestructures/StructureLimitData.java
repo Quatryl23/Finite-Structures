@@ -6,7 +6,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -16,6 +16,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -74,11 +75,6 @@ public class StructureLimitData extends SavedData {
         return new StructureLimitData(true, positions, synchronizedSets);
     }
 
-    public static StructureLimitData load(CompoundTag tag, HolderLookup.Provider provider) {
-        DataResult<StructureLimitData> result = CODEC.parse(RegistryOps.create(NbtOps.INSTANCE, provider), tag);
-        return result.getOrThrow();
-    }
-
     public boolean isInitialized() {
         return initialized;
     }
@@ -132,9 +128,18 @@ public class StructureLimitData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
-        DataResult<Tag> result = CODEC.encodeStart(RegistryOps.create(NbtOps.INSTANCE, provider), this);
-        return tag.merge((CompoundTag) result.getOrThrow());
+    public CompoundTag save(CompoundTag tag) {
+        RegistryAccess access = ServerLifecycleHooks.getCurrentServer().registryAccess();
+        DataResult<Tag> result = CODEC.encodeStart(RegistryOps.create(NbtOps.INSTANCE, access), this);
+        return tag.merge((CompoundTag) result.getOrThrow(false, string -> {
+        }));
+    }
+
+    public static StructureLimitData load(CompoundTag tag) {
+        RegistryAccess access = ServerLifecycleHooks.getCurrentServer().registryAccess();
+        DataResult<StructureLimitData> result = CODEC.parse(RegistryOps.create(NbtOps.INSTANCE, access), tag);
+        return result.getOrThrow(false, string -> {
+        });
     }
 
     public static class Positions {
