@@ -9,8 +9,6 @@ displayName = "${mod_name}"
 displayURL = "https://github.com/Quatryl23/Finite-Structures"
 authors = "${mod_authors}"
 description = '''${mod_description}'''
-[[mixins]]
-config = "${mod_id}.mixins.json"
 
 [[dependencies."${mod_id}"]]
 modId = "forge"
